@@ -1,0 +1,87 @@
+<%- include('./partials/header', {title: 'My Orders'}) %>
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Orders</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">My Orders</h1>
+
+    <% if (!customerName) { %>
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Please <a href="/customer/login" class="alert-link">login</a> to view your orders.
+        </div>
+    <% } else if (orders.length === 0) { %>
+        <div class="text-center py-5">
+            <i class="bi bi-box-seam fs-1 text-muted"></i>
+            <h4 class="mt-3 text-muted">No orders yet</h4>
+            <p class="text-muted">Start shopping to see your orders here</p>
+            <a href="/shop" class="btn btn-primary">
+                <i class="bi bi-shop me-2"></i>Start Shopping
+            </a>
+        </div>
+    <% } else { %>
+        <div class="row">
+            <% orders.forEach(order => { %>
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Order #<%= order.id %></strong>
+                                <small class="text-muted ms-3"><%= new Date(order.created_at).toLocaleDateString() %></small>
+                            </div>
+                            <span class="badge <%= order.order_status === 'delivered' ? 'bg-success' : order.order_status === 'shipped' ? 'bg-info' : order.order_status === 'cancelled' ? 'bg-danger' : 'bg-warning' %>">
+                                <%= order.order_status.toUpperCase() %>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="mb-3">Order Items</h6>
+                                    <% order.items.forEach(item => { %>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <img src="<%= item.image %>" class="img-thumbnail me-3" 
+                                                 style="width: 60px; height: 60px; object-fit: cover;"
+                                                 onerror="this.src='https://via.placeholder.com/60'">
+                                            <div class="flex-grow-1">
+                                                <strong><%= item.name %></strong>
+                                                <br><small class="text-muted">Qty: <%= item.quantity %> × ₹<%= parseFloat(item.price).toFixed(2) %></small>
+                                            </div>
+                                            <strong>₹<%= (item.quantity * parseFloat(item.price)).toFixed(2) %></strong>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="mb-3">Order Details</h6>
+                                    <p class="mb-2"><strong>Total:</strong> ₹<%= parseFloat(order.total_amount).toFixed(2) %></p>
+                                    <p class="mb-2"><strong>Payment:</strong> <%= order.payment_method.toUpperCase() %></p>
+                                    <p class="mb-2"><strong>Payment Status:</strong> 
+                                        <span class="badge <%= order.payment_status === 'paid' ? 'bg-success' : 'bg-warning' %>">
+                                            <%= order.payment_status.toUpperCase() %>
+                                        </span>
+                                    </p>
+                                    <p class="mb-0"><strong>Shipping Address:</strong></p>
+                                    <small class="text-muted"><%= order.shipping_address %></small>
+                                    <% if (order.order_status === 'pending') { %>
+                                        <hr class="my-3">
+                                        <form action="/orders/<%= order.id %>/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                                            <button type="submit" class="btn btn-danger w-100">
+                                                <i class="bi bi-x-circle me-2"></i>Cancel Order
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+</div>
+
+<%- include('./partials/footer') %>

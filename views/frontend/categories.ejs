@@ -1,0 +1,93 @@
+<%- include('./partials/header', {title: 'Categories'}) %>
+
+<!-- Hero Banner -->
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold mb-4">Shop by Category</h1>
+                <p class="lead mb-4">Explore our wide range of categories and find exactly what you're looking for.</p>
+                <a href="/shop" class="btn btn-outline-light btn-lg">
+                    <i class="bi bi-shop me-2"></i>View All Products
+                </a>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop" class="img-fluid rounded" alt="Categories" onerror="this.src='https://via.placeholder.com/600x400/667eea/ffffff?text=Categories'">
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Categories</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-md-4 col-6">
+            <div class="card category-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-laptop fs-1 text-primary mb-3"></i>
+                    <h4 class="card-title">Electronics</h4>
+                    <p class="card-text text-muted">Laptops, phones, accessories and more</p>
+                    <a href="/shop?category=Electronics" class="btn btn-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-6">
+            <div class="card category-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-bag fs-1 text-primary mb-3"></i>
+                    <h4 class="card-title">Clothing</h4>
+                    <p class="card-text text-muted">Men's, women's, and kids fashion</p>
+                    <a href="/shop?category=Clothing" class="btn btn-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-6">
+            <div class="card category-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-basket fs-1 text-primary mb-3"></i>
+                    <h4 class="card-title">Food</h4>
+                    <p class="card-text text-muted">Groceries, snacks, and beverages</p>
+                    <a href="/shop?category=Food" class="btn btn-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-6">
+            <div class="card category-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-book fs-1 text-primary mb-3"></i>
+                    <h4 class="card-title">Books</h4>
+                    <p class="card-text text-muted">Fiction, non-fiction, and educational</p>
+                    <a href="/shop?category=Books" class="btn btn-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-6">
+            <div class="card category-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-house fs-1 text-primary mb-3"></i>
+                    <h4 class="card-title">Home</h4>
+                    <p class="card-text text-muted">Furniture, decor, and kitchen essentials</p>
+                    <a href="/shop?category=Home" class="btn btn-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-6">
+            <div class="card category-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-trophy fs-1 text-primary mb-3"></i>
+                    <h4 class="card-title">Sports</h4>
+                    <p class="card-text text-muted">Equipment, apparel, and accessories</p>
+                    <a href="/shop?category=Sports" class="btn btn-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>

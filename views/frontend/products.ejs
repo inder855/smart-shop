@@ -1,0 +1,129 @@
+<%- include('./partials/header', {title: 'Products'}) %>
+
+<!-- Hero Banner -->
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold mb-4"><%= category ? category : 'All Products' %></h1>
+                <p class="lead mb-4">Discover our amazing collection of products at unbeatable prices.</p>
+                <% if (category) { %>
+                    <a href="/shop" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-x-circle me-2"></i>Clear Filter
+                    </a>
+                <% } %>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400&fit=crop" class="img-fluid rounded" alt="Products" onerror="this.src='https://via.placeholder.com/600x400/667eea/ffffff?text=Products'">
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-5">
+    <!-- Products Grid -->
+    <div class="row">
+        <div class="col-12">
+
+            <% if (products.length === 0) { %>
+                <div class="text-center py-5">
+                    <i class="bi bi-box-seam fs-1 text-muted"></i>
+                    <h4 class="mt-3 text-muted">No products found</h4>
+                    <p class="text-muted">Check back later for new arrivals</p>
+                </div>
+            <% } else { %>
+                <div class="row g-4">
+                    <% products.forEach(product => { %>
+                        <% 
+                            const images = product.images ? JSON.parse(product.images) : [];
+                            const firstImage = images.length > 0 ? images[0] : 'https://via.placeholder.com/300';
+                        %>
+                        <div class="col-md-4 col-6">
+                            <div class="card product-card h-100">
+                                <img src="<%= firstImage %>" class="card-img-top" alt="<%= product.name %>"
+                                     onerror="this.src='https://via.placeholder.com/300'">
+                                <div class="card-body">
+                                    <h5 class="card-title"><%= product.name %></h5>
+                                    <p class="card-text text-muted small">
+                                        <%= product.description ? product.description.substring(0, 60) + '...' : '' %>
+                                    </p>
+                                    <div class="mb-2">
+                                        <span class="badge <%= product.stock > 10 ? 'bg-success' : product.stock > 0 ? 'bg-warning' : 'bg-danger' %>">
+                                            <%= product.stock > 0 ? product.stock + ' in stock' : 'Out of stock' %>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h5 mb-0 text-primary">₹<%= parseFloat(product.price).toFixed(2) %></span>
+                                        <div class="btn-group">
+                                            <a href="/product/<%= product.id %>" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-primary add-to-cart" 
+                                                    data-id="<%= product.id %>" data-name="<%= product.name %>" 
+                                                    data-price="<%= product.price %>" data-image="<%= firstImage %>"
+                                                    <%= product.stock === 0 ? 'disabled' : '' %>>
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>
+
+<script>
+    // Add to cart functionality
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function() {
+            if (this.disabled) return;
+            
+            const product = {
+                id: this.dataset.id,
+                name: this.dataset.name,
+                price: parseFloat(this.dataset.price),
+                image: this.dataset.image,
+                quantity: 1
+            };
+            
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('cartCount').textContent = data.count;
+                    
+                    // Show toast notification
+                    const toast = document.createElement('div');
+                    toast.className = 'position-fixed bottom-0 end-0 p-3';
+                    toast.style.zIndex = '1100';
+                    toast.innerHTML = `
+                        <div class="toast show" role="alert">
+                            <div class="toast-header">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                <strong class="me-auto">Success</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                            </div>
+                            <div class="toast-body">
+                                ${product.name} added to cart!
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 3000);
+                }
+            });
+        });
+    });
+</script>

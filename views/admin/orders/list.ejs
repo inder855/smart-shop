@@ -1,0 +1,116 @@
+<%- include('../../partials/header', {title: 'Orders'}) %>
+
+<div class="container-fluid">
+    <div class="row">
+        <%- include('../../partials/sidebar') %>
+        
+        <div class="col-md-9 col-lg-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Orders</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Orders</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">All Orders</h5>
+                </div>
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+
+                    <% if (orders.length === 0) { %>
+                        <div class="text-center py-5">
+                            <i class="bi bi-box-seam fs-1 text-muted"></i>
+                            <h4 class="mt-3 text-muted">No orders found</h4>
+                            <p class="text-muted">Orders will appear here when customers place them</p>
+                        </div>
+                    <% } else { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Customer Email</th>
+                                        <th>Total</th>
+                                        <th>Payment Method</th>
+                                        <th>Payment Status</th>
+                                        <th>Order Status</th>
+                                        <th>Shipping Address</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% orders.forEach(order => { %>
+                                        <tr>
+                                            <td><strong>#<%= order.id %></strong></td>
+                                            <td><%= order.customer_name %></td>
+                                            <td><%= order.customer_email %></td>
+                                            <td>₹<%= parseFloat(order.total_amount).toFixed(2) %></td>
+                                            <td><%= order.payment_method.toUpperCase() %></td>
+                                            <td>
+                                                <span class="badge <%= order.payment_status === 'paid' ? 'bg-success' : 'bg-warning' %>">
+                                                    <%= order.payment_status.toUpperCase() %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge <%= order.order_status === 'delivered' ? 'bg-success' : order.order_status === 'shipped' ? 'bg-info' : order.order_status === 'cancelled' ? 'bg-danger' : 'bg-warning' %>">
+                                                    <%= order.order_status.toUpperCase() %>
+                                                </span>
+                                            </td>
+                                            <td><small><%= order.shipping_address %></small></td>
+                                            <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+                                            <td>
+                                                <% if (order.order_status !== 'delivered' && order.order_status !== 'cancelled') { %>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                            <i class="bi bi-gear"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><h6 class="dropdown-header">Update Status</h6></li>
+                                                            <li><a class="dropdown-item <%= order.order_status === 'pending' ? 'active' : '' %>" href="/admin/orders/<%= order.id %>/status/pending">
+                                                                <i class="bi bi-clock me-2"></i>Pending
+                                                            </a></li>
+                                                            <li><a class="dropdown-item <%= order.order_status === 'processing' ? 'active' : '' %>" href="/admin/orders/<%= order.id %>/status/processing">
+                                                                <i class="bi bi-gear me-2"></i>Processing
+                                                            </a></li>
+                                                            <li><a class="dropdown-item <%= order.order_status === 'shipped' ? 'active' : '' %>" href="/admin/orders/<%= order.id %>/status/shipped">
+                                                                <i class="bi bi-truck me-2"></i>Shipped
+                                                            </a></li>
+                                                            <li><a class="dropdown-item <%= order.order_status === 'delivered' ? 'active' : '' %>" href="/admin/orders/<%= order.id %>/status/delivered">
+                                                                <i class="bi bi-check-circle me-2"></i>Delivered
+                                                            </a></li>
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li><a class="dropdown-item text-danger" href="/admin/orders/<%= order.id %>/cancel" onclick="return confirm('Are you sure you want to cancel this order?');">
+                                                                <i class="bi bi-x-circle me-2"></i>Cancel Order
+                                                            </a></li>
+                                                        </ul>
+                                                    </div>
+                                                <% } else { %>
+                                                    <span class="text-muted">-</span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../../partials/footer') %>

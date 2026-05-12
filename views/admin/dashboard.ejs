@@ -1,0 +1,210 @@
+<%- include('../partials/header', {title: 'Dashboard'}) %>
+
+<div class="container-fluid">
+    <div class="row">
+        <%- include('../partials/sidebar') %>
+        
+        <div class="col-md-9 col-lg-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Dashboard</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card bg-primary text-white">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-white bg-opacity-25 me-3">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title mb-0"><%= stats.totalProducts %></h3>
+                                <p class="card-text mb-0">Total Products</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-success text-white">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-white bg-opacity-25 me-3">
+                                <i class="bi bi-cart-check"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title mb-0"><%= stats.totalOrders %></h3>
+                                <p class="card-text mb-0">Total Orders</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-info text-white">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-white bg-opacity-25 me-3">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title mb-0"><%= stats.totalCustomers %></h3>
+                                <p class="card-text mb-0">Total Customers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stat-card bg-warning text-white">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="stat-icon bg-white bg-opacity-25 me-3">
+                                <i class="bi bi-currency-rupee"></i>
+                            </div>
+                            <div>
+                                <h3 class="card-title mb-0">₹<%= parseFloat(stats.totalRevenue).toFixed(2) %></h3>
+                                <p class="card-text mb-0">Total Revenue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning-charge me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="/products/add" class="btn btn-primary w-100">
+                                <i class="bi bi-plus-circle me-2"></i>Add Product
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/orders" class="btn btn-success w-100">
+                                <i class="bi bi-list-check me-2"></i>View Orders
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-info w-100" disabled>
+                                <i class="bi bi-tags me-2"></i>Manage Categories
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/customers" class="btn btn-warning w-100">
+                                <i class="bi bi-person-gear me-2"></i>View Customers
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Recent Orders
+                    </h5>
+                    <a href="/admin/orders" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (recentOrders.length === 0) { %>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">
+                                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                            No orders yet
+                                        </td>
+                                    </tr>
+                                <% } else { %>
+                                    <% recentOrders.forEach(order => { %>
+                                        <tr>
+                                            <td><strong>#<%= order.id %></strong></td>
+                                            <td><%= order.customer_name %></td>
+                                            <td>₹<%= parseFloat(order.total_amount).toFixed(2) %></td>
+                                            <td>
+                                                <span class="badge <%= order.order_status === 'delivered' ? 'bg-success' : order.order_status === 'shipped' ? 'bg-info' : order.order_status === 'cancelled' ? 'bg-danger' : 'bg-warning' %>">
+                                                    <%= order.order_status.toUpperCase() %>
+                                                </span>
+                                            </td>
+                                            <td><%= new Date(order.created_at).toLocaleDateString() %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Products -->
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-box me-2"></i>Recent Products
+                    </h5>
+                    <a href="/products" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product ID</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (recentProducts.length === 0) { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">
+                                            <i class="bi bi-box-seam fs-1 d-block mb-2"></i>
+                                            No products yet
+                                        </td>
+                                    </tr>
+                                <% } else { %>
+                                    <% recentProducts.forEach(product => { %>
+                                        <tr>
+                                            <td><%= product.id %></td>
+                                            <td><%= product.name %></td>
+                                            <td><%= product.category %></td>
+                                            <td>₹<%= parseFloat(product.price).toFixed(2) %></td>
+                                            <td><%= product.stock %></td>
+                                            <td>
+                                                <span class="badge <%= product.stock > 0 ? 'bg-success' : 'bg-danger' %>">
+                                                    <%= product.stock > 0 ? 'In Stock' : 'Out of Stock' %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

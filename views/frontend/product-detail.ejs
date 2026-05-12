@@ -1,0 +1,175 @@
+<%- include('./partials/header', {title: product.name}) %>
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/shop">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body p-0">
+                    <% 
+                        const images = product.images ? JSON.parse(product.images) : [];
+                        const mainImage = images.length > 0 ? images[0] : 'https://via.placeholder.com/600';
+                    %>
+                    <img src="<%= mainImage %>" id="mainImage" class="img-fluid w-100" 
+                         style="height: 500px; object-fit: cover;" alt="<%= product.name %>"
+                         onerror="this.src='https://via.placeholder.com/600'">
+                </div>
+            </div>
+            <% if (images.length > 1) { %>
+                <div class="row g-2 mt-2">
+                    <% images.forEach((image, index) => { %>
+                        <div class="col-3">
+                            <img src="<%= image %>" class="img-thumbnail thumbnail" 
+                                 style="height: 100px; object-fit: cover; cursor: pointer;"
+                                 onclick="changeMainImage('<%= image %>')" alt="Thumbnail <%= index + 1 %>">
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-md-6">
+            <h1 class="mb-3"><%= product.name %></h1>
+            <div class="mb-3">
+                <span class="badge <%= product.status === 'active' ? 'bg-success' : 'bg-secondary' %>">
+                    <%= product.status %>
+                </span>
+                <% if (product.category) { %>
+                    <span class="badge bg-info"><%= product.category %></span>
+                <% } %>
+            </div>
+            <h2 class="text-primary mb-4">₹<%= parseFloat(product.price).toFixed(2) %></h2>
+            
+            <div class="mb-4">
+                <h5>Description</h5>
+                <p class="text-muted"><%= product.description || 'No description available.' %></p>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="me-3">Availability:</span>
+                    <span class="badge <%= product.stock > 10 ? 'bg-success' : product.stock > 0 ? 'bg-warning' : 'bg-danger' %>">
+                        <%= product.stock > 0 ? product.stock + ' in stock' : 'Out of stock' %>
+                    </span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex align-items-center">
+                    <label class="me-3">Quantity:</label>
+                    <div class="input-group" style="width: 150px;">
+                        <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">-</button>
+                        <input type="number" class="form-control text-center" id="quantity" value="1" min="1" 
+                               max="<%= product.stock %>" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mb-4">
+                <button class="btn btn-primary btn-lg flex-grow-1 add-to-cart-btn" 
+                        <%= product.stock === 0 ? 'disabled' : '' %>>
+                    <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                </button>
+                <button class="btn btn-outline-danger btn-lg">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Key Features</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>High Quality</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Fast Delivery</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Easy Returns</li>
+                        <li><i class="bi bi-check-circle text-success me-2"></i>Secure Payment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>
+
+<script>
+    const maxStock = <%= product.stock %>;
+    const productId = '<%= product.id %>';
+    const productName = '<%= product.name %>';
+    const productPrice = <%= product.price %>;
+    const productImage = '<%= images.length > 0 ? images[0] : "https://via.placeholder.com/300" %>';
+
+    function changeMainImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+
+    function increaseQty() {
+        const qtyInput = document.getElementById('quantity');
+        if (parseInt(qtyInput.value) < maxStock) {
+            qtyInput.value = parseInt(qtyInput.value) + 1;
+        }
+    }
+
+    function decreaseQty() {
+        const qtyInput = document.getElementById('quantity');
+        if (parseInt(qtyInput.value) > 1) {
+            qtyInput.value = parseInt(qtyInput.value) - 1;
+        }
+    }
+
+    document.querySelector('.add-to-cart-btn').addEventListener('click', function() {
+        if (this.disabled) return;
+        
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const product = {
+            id: productId,
+            name: productName,
+            price: productPrice,
+            image: productImage,
+            quantity: quantity
+        };
+        
+        fetch('/cart/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('cartCount').textContent = data.count;
+                
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed bottom-0 end-0 p-3';
+                toast.style.zIndex = '1100';
+                toast.innerHTML = `
+                    <div class="toast show" role="alert">
+                        <div class="toast-header">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <strong class="me-auto">Success</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                        </div>
+                        <div class="toast-body">
+                            ${quantity} x ${productName} added to cart!
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+        });
+    });
+</script>

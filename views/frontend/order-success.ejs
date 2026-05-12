@@ -1,0 +1,35 @@
+<%- include('./partials/header', {title: 'Order Placed'}) %>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h1 class="mb-3">Order Placed Successfully!</h1>
+                    <p class="lead text-muted mb-4">Thank you for your purchase.</p>
+                    
+                    <div class="alert alert-info">
+                        <strong>Order ID:</strong> #<%= orderId %><br>
+                        <strong>Total Amount:</strong> ₹<%= parseFloat(total).toFixed(2) %>
+                    </div>
+
+                    <p class="text-muted">We have received your order and will process it soon. You will receive an email confirmation shortly.</p>
+
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="/orders" class="btn btn-primary">
+                            <i class="bi bi-box-seam me-2"></i>View My Orders
+                        </a>
+                        <a href="/shop" class="btn btn-outline-secondary">
+                            <i class="bi bi-shop me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>

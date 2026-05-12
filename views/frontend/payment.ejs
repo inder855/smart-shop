@@ -1,0 +1,151 @@
+<%- include('./partials/header', {title: 'Payment'}) %>
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/cart">Cart</a></li>
+            <li class="breadcrumb-item"><a href="/checkout">Checkout</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Payment</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Payment</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-credit-card fs-1 text-primary"></i>
+                        <h3 class="mt-3">Complete Your Payment</h3>
+                        <p class="text-muted">Total Amount: <strong class="text-primary">₹<%= parseFloat(total).toFixed(2) %></strong></p>
+                    </div>
+
+                    <% if (paymentMethod === 'cod') { %>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Cash on Delivery</strong>
+                            <p class="mb-0 mt-2">You will pay ₹<%= parseFloat(total).toFixed(2) %> when your order is delivered.</p>
+                        </div>
+                        <form action="/payment/process" method="POST">
+                            <input type="hidden" name="paymentMethod" value="cod">
+                            <button type="submit" class="btn btn-success btn-lg w-100">
+                                <i class="bi bi-check-circle me-2"></i>Confirm Order
+                            </button>
+                        </form>
+                    <% } else if (paymentMethod === 'card') { %>
+                        <form id="paymentForm" action="/payment/process" method="POST" novalidate>
+                            <input type="hidden" name="paymentMethod" value="card">
+                            
+                            <div class="mb-3">
+                                <label for="cardNumber" class="form-label">Card Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cardNumber" name="cardNumber" 
+                                       placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <div class="invalid-feedback">Please enter card number.</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="expiry" class="form-label">Expiry Date <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="expiry" name="expiry" 
+                                           placeholder="MM/YY" maxlength="5" required>
+                                    <div class="invalid-feedback">Please enter expiry date.</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cvv" class="form-label">CVV <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="cvv" name="cvv" 
+                                           placeholder="123" maxlength="3" required>
+                                    <div class="invalid-feedback">Please enter CVV.</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="cardName" class="form-label">Name on Card <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="cardName" name="cardName" required>
+                                <div class="invalid-feedback">Please enter name on card.</div>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <i class="bi bi-shield-lock me-2"></i>
+                                <strong>Dummy Payment Mode</strong>
+                                <p class="mb-0 small">This is a demo payment. No actual charge will be made.</p>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-credit-card me-2"></i>Pay ₹<%= parseFloat(total).toFixed(2) %>
+                            </button>
+                        </form>
+                    <% } else if (paymentMethod === 'upi') { %>
+                        <form id="upiForm" action="/payment/process" method="POST" novalidate>
+                            <input type="hidden" name="paymentMethod" value="upi">
+                            
+                            <div class="mb-3">
+                                <label for="upiId" class="form-label">UPI ID <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="upiId" name="upiId" 
+                                       placeholder="yourname@upi" required>
+                                <div class="invalid-feedback">Please enter UPI ID.</div>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <i class="bi bi-shield-lock me-2"></i>
+                                <strong>Dummy Payment Mode</strong>
+                                <p class="mb-0 small">This is a demo payment. No actual charge will be made.</p>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-qr-code me-2"></i>Pay via UPI
+                            </button>
+                        </form>
+                    <% } %>
+
+                    <div class="text-center mt-4">
+                        <a href="/checkout" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Checkout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('./partials/footer') %>
+
+<script>
+    (function () {
+        'use strict'
+        const form = document.getElementById('paymentForm') || document.getElementById('upiForm');
+        if (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        }
+    })();
+
+    // Format card number
+    const cardNumber = document.getElementById('cardNumber');
+    if (cardNumber) {
+        cardNumber.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+            let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formatted;
+        });
+    }
+
+    // Format expiry date
+    const expiry = document.getElementById('expiry');
+    if (expiry) {
+        expiry.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            e.target.value = value;
+        });
+    }
+</script>

@@ -1,0 +1,182 @@
+<%- include('./partials/header', {title: 'My Profile'}) %>
+
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+        </ol>
+    </nav>
+
+    <% if (!customerName) { %>
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Please <a href="/customer/login" class="alert-link">login</a> to view your profile.
+        </div>
+    <% } else { %>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-person-circle fs-1 text-primary"></i>
+                        </div>
+                        <h4 class="card-title"><%= customerName %></h4>
+                        <p class="card-text text-muted"><%= customerEmail %></p>
+                        <hr>
+                        <div class="text-start">
+                            <p class="mb-1"><strong>Member Since:</strong></p>
+                            <p class="text-muted"><%= new Date(customer.created_at).toLocaleDateString() %></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <% if (error) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <%= error %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+                        <% if (success) { %>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <%= success %>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        <% } %>
+
+                        <form id="profileForm" action="/profile/update" method="POST" novalidate>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" value="<%= customer.name %>" required>
+                                    <div class="invalid-feedback">Please enter your name.</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="<%= customer.phone || '' %>">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" value="<%= customer.email %>" readonly>
+                                <small class="text-muted">Email cannot be changed</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="3"><%= customer.address || '' %></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" value="<%= customer.city || '' %>">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="state" class="form-label">State</label>
+                                    <input type="text" class="form-control" id="state" name="state" value="<%= customer.state || '' %>">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="pincode" class="form-label">Pincode</label>
+                                    <input type="text" class="form-control" id="pincode" name="pincode" value="<%= customer.pincode || '' %>" pattern="[0-9]{6}" maxlength="6">
+                                    <div class="invalid-feedback">Please enter a valid 6-digit pincode.</div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h6 class="mb-3">Change Password</h6>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="currentPassword" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="currentPassword" name="currentPassword">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="newPassword" class="form-label">New Password</label>
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword" minlength="6">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a href="/orders" class="btn btn-outline-secondary">
+                                    <i class="bi bi-box-seam me-2"></i>My Orders
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save me-2"></i>Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<%- include('./partials/footer') %>
+
+<% if (customerName) { %>
+<script>
+    (function () {
+        'use strict'
+        const form = document.getElementById('profileForm');
+        const newPassword = document.getElementById('newPassword');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const currentPassword = document.getElementById('currentPassword');
+
+        form.addEventListener('submit', function (event) {
+            // Validate password change only if current password is provided
+            if (currentPassword.value) {
+                if (!newPassword.value || newPassword.value.length < 6) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    newPassword.setCustomValidity('New password is required');
+                } else {
+                    newPassword.setCustomValidity('');
+                }
+
+                if (newPassword.value !== confirmPassword.value) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    confirmPassword.setCustomValidity('Passwords do not match');
+                } else {
+                    confirmPassword.setCustomValidity('');
+                }
+            }
+
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+
+        // Pincode - only digits
+        document.getElementById('pincode').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        confirmPassword.addEventListener('input', function() {
+            if (this.value === newPassword.value) {
+                this.setCustomValidity('');
+            } else {
+                this.setCustomValidity('Passwords do not match');
+            }
+        });
+    })();
+</script>
+<% } %>

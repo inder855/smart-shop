@@ -1,0 +1,221 @@
+<%- include('../../partials/header', {title: 'Edit Product'}) %>
+
+<div class="container-fluid">
+    <div class="row">
+        <%- include('../../partials/sidebar') %>
+        
+        <div class="col-md-9 col-lg-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Edit Product</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/dashboard" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/products" class="text-decoration-none">Products</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Product</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Edit Product Information</h5>
+                </div>
+                <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+
+                    <form id="productForm" action="/products/edit/<%= product.id %>" method="POST" enctype="multipart/form-data" novalidate>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" required 
+                                           value="<%= product.name %>" placeholder="Enter product name">
+                                    <div class="invalid-feedback">
+                                        Please enter product name.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="description" name="description" rows="4"
+                                              placeholder="Enter product description"><%= product.description || '' %></textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="price" class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="price" name="price" required 
+                                                   min="0" step="0.01" value="<%= product.price %>" placeholder="0.00">
+                                            <div class="invalid-feedback">
+                                                Please enter a valid price.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="stock" class="form-label">Stock Quantity</label>
+                                            <input type="number" class="form-control" id="stock" name="stock" 
+                                                   min="0" value="<%= product.stock %>" placeholder="0">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="category" class="form-label">Category</label>
+                                            <select class="form-select" id="category" name="category">
+                                                <option value="">Select Category</option>
+                                                <option value="Electronics" <%= product.category === 'Electronics' ? 'selected' : '' %>>Electronics</option>
+                                                <option value="Clothing" <%= product.category === 'Clothing' ? 'selected' : '' %>>Clothing</option>
+                                                <option value="Food" <%= product.category === 'Food' ? 'selected' : '' %>>Food</option>
+                                                <option value="Books" <%= product.category === 'Books' ? 'selected' : '' %>>Books</option>
+                                                <option value="Home" <%= product.category === 'Home' ? 'selected' : '' %>>Home</option>
+                                                <option value="Sports" <%= product.category === 'Sports' ? 'selected' : '' %>>Sports</option>
+                                                <option value="Other" <%= product.category === 'Other' ? 'selected' : '' %>>Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="status" class="form-label">Status</label>
+                                            <select class="form-select" id="status" name="status">
+                                                <option value="active" <%= product.status === 'active' ? 'selected' : '' %>>Active</option>
+                                                <option value="inactive" <%= product.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Images</label>
+                                    <div id="existingImages" class="d-flex flex-wrap gap-2 mb-3">
+                                        <% product.images.forEach((image, index) => { %>
+                                            <div class="position-relative">
+                                                <img src="<%= image %>" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                                                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1 rounded-circle"
+                                                        onclick="deleteImage('<%= image %>', <%= product.id %>)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                                <input type="hidden" name="existingImages" value="<%= image %>">
+                                            </div>
+                                        <% }); %>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="images" class="form-label">Add New Images</label>
+                                    <input type="file" class="form-control" id="images" name="images" 
+                                           multiple accept="image/*">
+                                    <div class="form-text">
+                                        Upload up to 5 new images (Max 5MB each). Allowed: JPG, PNG, GIF, WEBP
+                                    </div>
+                                </div>
+
+                                <div id="imagePreview" class="mb-3">
+                                    <label class="form-label">New Image Preview</label>
+                                    <div id="previewContainer" class="d-flex flex-wrap gap-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="/products" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Update Product
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../../partials/footer') %>
+
+<script>
+    // Delete image
+    function deleteImage(imageUrl, productId) {
+        if (confirm('Are you sure you want to delete this image?')) {
+            fetch('/products/' + productId + '/delete-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ imageUrl: imageUrl })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting image');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting image');
+            });
+        }
+    }
+
+    // Image preview
+    document.getElementById('images').addEventListener('change', function(e) {
+        const previewContainer = document.getElementById('previewContainer');
+        previewContainer.innerHTML = '';
+        
+        const files = Array.from(e.target.files);
+        const existingCount = document.querySelectorAll('#existingImages img').length;
+        
+        if (existingCount + files.length > 5) {
+            alert('Maximum 5 images allowed total');
+            e.target.value = '';
+            return;
+        }
+
+        files.forEach(file => {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size exceeds 5MB limit');
+                e.target.value = '';
+                previewContainer.innerHTML = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'position-relative';
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                `;
+                previewContainer.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    // Bootstrap form validation
+    (function () {
+        'use strict'
+        const form = document.getElementById('productForm');
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    })();
+</script>

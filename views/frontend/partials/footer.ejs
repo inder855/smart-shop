@@ -1,0 +1,357 @@
+    <footer class="bg-dark text-white mt-5">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">
+                        <i class="bi bi-shop me-2"></i>Smart Shop
+                    </h5>
+                    <p class="text-muted">Your one-stop shop for all your needs. Quality products at affordable prices.</p>
+                    <div class="mt-3">
+                        <a href="#" class="text-white me-3"><i class="bi bi-facebook fs-4"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-twitter fs-4"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-instagram fs-4"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-linkedin fs-4"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="/shop" class="text-muted text-decoration-none">Products</a></li>
+                        <li class="mb-2"><a href="/categories" class="text-muted text-decoration-none">Categories</a></li>
+                        <li class="mb-2"><a href="/about" class="text-muted text-decoration-none">About Us</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5 class="mb-3">Customer Service</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">FAQ</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Shipping Info</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Returns</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Newsletter</h5>
+                    <p class="text-muted">Subscribe to get updates on new products and offers.</p>
+                    <form class="d-flex">
+                        <input type="email" class="form-control me-2" placeholder="Enter your email">
+                        <button class="btn btn-primary" type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-muted mb-0">&copy; 2024 Smart Shop. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-muted text-decoration-none me-3">Terms of Service</a>
+                    <a href="#" class="text-muted text-decoration-none">Refund Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script>
+        // Update cart count
+        async function updateCartCount() {
+            try {
+                const response = await fetch('/cart/count');
+                const data = await response.json();
+                document.getElementById('cartCount').textContent = data.count || 0;
+            } catch (err) {
+                document.getElementById('cartCount').textContent = '0';
+            }
+        }
+        
+        // Initialize cart count on page load
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+    </script>
+
+    <!-- Account Modal -->
+    <% if (!customerName) { %>
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white border-0">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-shop fs-3 me-3"></i>
+                        <div>
+                            <h5 class="modal-title mb-0">Welcome to Smart Shop</h5>
+                            <small class="text-white-50">Login or create an account to continue</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="authError" class="alert alert-danger d-none"></div>
+                    <div id="authSuccess" class="alert alert-success d-none"></div>
+                    <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded" id="accountTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded" id="login-tab" data-bs-toggle="pill" data-bs-target="#login" type="button" role="tab">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded" id="register-tab" data-bs-toggle="pill" data-bs-target="#register" type="button" role="tab">
+                                <i class="bi bi-person-plus me-2"></i>Create Account
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="accountTabsContent">
+                        <!-- Login Tab -->
+                        <div class="tab-pane fade show active" id="login" role="tabpanel">
+                            <form id="modalLoginForm" novalidate>
+                                <div class="mb-3">
+                                    <label for="modalEmail" class="form-label fw-semibold">
+                                        <i class="bi bi-envelope me-2 text-primary"></i>Email Address
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input type="email" class="form-control" id="modalEmail" name="email" placeholder="Enter your email" required>
+                                        <div class="invalid-feedback">Please enter a valid email.</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="modalPassword" class="form-label fw-semibold">
+                                        <i class="bi bi-lock me-2 text-primary"></i>Password
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                        <input type="password" class="form-control" id="modalPassword" name="password" placeholder="Enter your password" required>
+                                        <div class="invalid-feedback">Please enter your password.</div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">
+                                            Remember me for 24 hours
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>Login to Continue
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Register Tab -->
+                        <div class="tab-pane fade" id="register" role="tabpanel">
+                            <form id="modalRegisterForm" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="modalName" class="form-label fw-semibold">
+                                            <i class="bi bi-person me-2 text-primary"></i>Full Name
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" class="form-control" id="modalName" name="name" placeholder="Your full name" required>
+                                            <div class="invalid-feedback">Please enter your name.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="modalPhone" class="form-label fw-semibold">
+                                            <i class="bi bi-telephone me-2 text-primary"></i>Phone Number
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                            <input type="tel" class="form-control" id="modalPhone" name="phone" placeholder="Your phone number" required>
+                                            <div class="invalid-feedback">Please enter your phone number.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="modalRegEmail" class="form-label fw-semibold">
+                                        <i class="bi bi-envelope me-2 text-primary"></i>Email Address
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                        <input type="email" class="form-control" id="modalRegEmail" name="email" placeholder="Enter your email" required>
+                                        <div class="invalid-feedback">Please enter a valid email.</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="modalAddress" class="form-label fw-semibold">
+                                        <i class="bi bi-geo-alt me-2 text-primary"></i>Address
+                                    </label>
+                                    <textarea class="form-control" id="modalAddress" name="address" rows="2" placeholder="Your full address" required></textarea>
+                                    <div class="invalid-feedback">Please enter your address.</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="modalCity" class="form-label fw-semibold">
+                                            <i class="bi bi-building me-2 text-primary"></i>City
+                                        </label>
+                                        <input type="text" class="form-control" id="modalCity" name="city" placeholder="City" required>
+                                        <div class="invalid-feedback">Please enter your city.</div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="modalState" class="form-label fw-semibold">
+                                            <i class="bi bi-map me-2 text-primary"></i>State
+                                        </label>
+                                        <input type="text" class="form-control" id="modalState" name="state" placeholder="State" required>
+                                        <div class="invalid-feedback">Please enter your state.</div>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="modalPincode" class="form-label fw-semibold">
+                                            <i class="bi bi-geo-alt-fill me-2 text-primary"></i>Pincode
+                                        </label>
+                                        <input type="text" class="form-control" id="modalPincode" name="pincode" placeholder="Pincode" pattern="[0-9]{6}" maxlength="6" required>
+                                        <div class="invalid-feedback">Please enter a valid 6-digit pincode.</div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="modalRegPassword" class="form-label fw-semibold">
+                                            <i class="bi bi-lock me-2 text-primary"></i>Password
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                            <input type="password" class="form-control" id="modalRegPassword" name="password" placeholder="Create password" required minlength="6">
+                                            <div class="invalid-feedback">Password must be at least 6 characters.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="modalConfirmPassword" class="form-label fw-semibold">
+                                            <i class="bi bi-shield-lock me-2 text-primary"></i>Confirm Password
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                                            <input type="password" class="form-control" id="modalConfirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                                            <div class="invalid-feedback">Please confirm your password.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="terms" required>
+                                        <label class="form-check-label" for="terms">
+                                            I agree to the <a href="#" class="text-primary">Terms & Conditions</a>
+                                        </label>
+                                        <div class="invalid-feedback">You must agree before submitting.</div>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-person-plus me-2"></i>Create Account
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // AJAX Login
+        const modalLoginForm = document.getElementById('modalLoginForm');
+        if (modalLoginForm) {
+            modalLoginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/customer/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('authSuccess').textContent = 'Login successful! Redirecting...';
+                    document.getElementById('authSuccess').classList.remove('d-none');
+                    document.getElementById('authError').classList.add('d-none');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    document.getElementById('authError').textContent = result.error || 'Login failed';
+                    document.getElementById('authError').classList.remove('d-none');
+                }
+            } catch (err) {
+                document.getElementById('authError').textContent = 'An error occurred';
+                document.getElementById('authError').classList.remove('d-none');
+            }
+            });
+        }
+
+        // AJAX Register
+        const modalRegisterForm = document.getElementById('modalRegisterForm');
+        if (modalRegisterForm) {
+            modalRegisterForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('modalRegPassword');
+            const confirmPassword = document.getElementById('modalConfirmPassword');
+            
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity('Passwords do not match');
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+            
+            if (!this.checkValidity()) {
+                e.stopPropagation();
+                this.classList.add('was-validated');
+                return;
+            }
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const response = await fetch('/customer/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('authSuccess').textContent = 'Account created! Please login.';
+                    document.getElementById('authSuccess').classList.remove('d-none');
+                    document.getElementById('authError').classList.add('d-none');
+                    document.getElementById('login-tab').click();
+                    this.reset();
+                    this.classList.remove('was-validated');
+                } else {
+                    document.getElementById('authError').textContent = result.error || 'Registration failed';
+                    document.getElementById('authError').classList.remove('d-none');
+                }
+            } catch (err) {
+                document.getElementById('authError').textContent = 'An error occurred';
+                document.getElementById('authError').classList.remove('d-none');
+            }
+            });
+        }
+
+        if (document.getElementById('modalConfirmPassword')) {
+            document.getElementById('modalConfirmPassword').addEventListener('input', function() {
+                const password = document.getElementById('modalRegPassword');
+                if (this.value === password.value) {
+                    this.setCustomValidity('');
+                } else {
+                    this.setCustomValidity('Passwords do not match');
+                }
+            });
+        }
+    </script>
+    <% } %>
+</body>
+</html>
